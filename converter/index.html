@@ -1,0 +1,60 @@
+<!doctype html>
+<title>hex converter</title>
+
+<link href='http://fonts.googleapis.com/css?family=Roboto+Mono' rel='stylesheet' type='text/css'>
+<style>
+  body {
+    font-family: 'Roboto Mono';
+    background: #CCC;
+  }
+
+  .title {
+    display: block;
+  }
+  .big_title {
+    font-size: 3em;
+  }
+</style>
+
+<div class='big_title'>
+  Converter
+</div>
+<div>
+  <div class='title'>Hex</div><input class='hex input'></input>
+</div>
+<div>
+  <div class='title'>Decimal</div><input class='dec input'></input>
+</div>
+<div>
+  <div class='title'>Binary</div><input class='bin input'></input>
+</div>
+
+<script>
+var hex = null;
+var dec = null;
+var bin = null;
+window.addEventListener('load', function() {
+  hex = document.querySelector('.hex.input');
+  hex.value = 0;
+  hex.addEventListener('input', function() {
+    var value = parseInt(hex.value, 16);
+    dec.value = value.toString(10);
+    bin.value = value.toString(2);
+  }, false);
+
+  dec = document.querySelector('.dec.input');
+  dec.value = 0;
+  dec.addEventListener('input', function() {
+    var value = parseInt(dec.value, 10);
+    hex.value = value.toString(16);
+    bin.value = value.toString(2);
+  }, false);
+  bin = document.querySelector('.bin.input');
+  bin.value = 0;
+  bin.addEventListener('input', function() {
+    var value = parseInt(bin.value, 2);
+    hex.value = value.toString(16);
+    dec.value = value.toString(10);
+  }, false);
+}, false);
+</script>
