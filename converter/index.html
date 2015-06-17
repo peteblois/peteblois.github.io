@@ -28,33 +28,57 @@
 <div>
   <div class='title'>Binary</div><input class='bin input'></input>
 </div>
+<div>
+  <div class='title'>UTF-16</div><input class='ascii input'></input>
+</div>
 
 <script>
 var hex = null;
 var dec = null;
 var bin = null;
+var ascii = null;
+function updateValue(value, exclude) {
+  if (exclude != hex) {
+    hex.value = value.toString(16);
+  }
+  if (exclude != dec) {
+    dec.value = value.toString(10);
+  }
+  if (exclude != bin) {
+    bin.value = value.toString(2);
+  }
+  if (exclude != ascii) {
+    try {
+      ascii.value = String.fromCodePoint(value);
+    } catch(e) {}
+  }
+}
 window.addEventListener('load', function() {
   hex = document.querySelector('.hex.input');
   hex.value = 0;
   hex.addEventListener('input', function() {
-    var value = parseInt(hex.value, 16);
-    dec.value = value.toString(10);
-    bin.value = value.toString(2);
+    updateValue(parseInt(hex.value, 16), hex);
   }, false);
 
   dec = document.querySelector('.dec.input');
   dec.value = 0;
   dec.addEventListener('input', function() {
-    var value = parseInt(dec.value, 10);
-    hex.value = value.toString(16);
-    bin.value = value.toString(2);
+    updateValue(parseInt(dec.value, 10), dec);
   }, false);
   bin = document.querySelector('.bin.input');
   bin.value = 0;
   bin.addEventListener('input', function() {
-    var value = parseInt(bin.value, 2);
-    hex.value = value.toString(16);
-    dec.value = value.toString(10);
+    updateValue(parseInt(bin.value, 2), bin);
+  }, false);
+
+  ascii = document.querySelector('.ascii.input');
+  ascii.value = 0;
+  ascii.addEventListener('input', function() {
+    if (ascii.value.length > 0) {
+      updateValue(ascii.value.codePointAt(0), ascii);
+    } else {
+      updateValue(0, ascii);
+    }
   }, false);
 }, false);
 </script>
