@@ -1,0 +1,64 @@
+<body>
+
+<script>
+  async function run() {
+    function layout() {
+      return new Promise((resolve) => setTimeout(resolve, 500));
+    }
+
+    const topMargin = 100;
+
+    const container = document.createElement('div');
+    container.style.height = '500px';
+    container.style.overflow = 'scroll';
+    container.style.marginTop = `${topMargin}px`;
+    container.classList.add('scroller');
+
+    document.body.appendChild(container);
+
+    let visible = false;
+
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        visible = !visible;
+        console.log(`visible: ${visible}`);
+      }
+    }, {
+      root: container,
+      rootMargin: `-50px 0px 0px 0px`,
+    });
+
+    const bufferTop = document.createElement('div');
+    bufferTop.style.height = '100px';
+    container.appendChild(bufferTop);
+
+    const item = document.createElement('div');
+    item.style.width = '50px';
+    item.style.height = '50px';
+    item.style.background = 'red';
+    container.appendChild(item);
+
+    const bufferBottom = document.createElement('div');
+    bufferBottom.style.height = '10000px';
+    container.appendChild(bufferBottom);
+
+    document.body.appendChild(container);
+
+    observer.observe(item);
+
+    container.scrollTop = 100;
+    await layout();
+
+    if (!visible) {
+      console.error('Expected element to still be visible!!');
+    }
+
+    container.scrollTop = 101;
+    await layout();
+
+    if (visible) {
+      console.error('Expected element to not be visible!!');
+    }
+  }
+  run();
+</script>
