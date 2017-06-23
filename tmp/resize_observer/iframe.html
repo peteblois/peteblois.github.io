@@ -1,0 +1,45 @@
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+  }
+</style>
+<body>
+  <button id='add'>Add row</button>
+  <button id='remove'>Remove row</button>
+  <button id='inline'>Add inline content</button>
+  <div id='content'></div>
+
+<script>
+const content = document.querySelector('#content');
+
+document.querySelector('#add').addEventListener('click', () => {
+  const div = document.createElement('div');
+  div.textContent = 'This is a row.';
+  content.appendChild(div);
+});
+
+document.querySelector('#remove').addEventListener('click', () => {
+  if (content.children.length > 0) {
+    content.children[0].remove();
+  }
+});
+
+document.querySelector('#inline').addEventListener('click', () => {
+  const div = document.createElement('div');
+  div.style.display = 'inline';
+  div.style.padding = '20px';
+  div.textContent = 'This is inlined content.';
+  content.appendChild(div);
+})
+
+const observer = new ResizeObserver((entries) => {
+  for (const entry of entries) {
+    window.parent.postMessage({
+      height: entry.contentRect.height,
+    }, '*');
+  }
+});
+observer.observe(document.body);
+</script>
+</body>
