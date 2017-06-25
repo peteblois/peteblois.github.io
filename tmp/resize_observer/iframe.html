@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <style>
   body {
     margin: 0;
@@ -36,7 +37,7 @@ document.querySelector('#inline').addEventListener('click', () => {
 const observer = new ResizeObserver((entries) => {
   for (const entry of entries) {
     window.parent.postMessage({
-      height: entry.contentRect.height,
+      height: document.body.scrollHeight,
     }, '*');
   }
 });
