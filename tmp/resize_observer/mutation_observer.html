@@ -5,6 +5,13 @@
     height: 0px;
   }
 </style>
+The iframe should expand and collapse for the items being added and removed to
+the DOM.
+
+<ol>
+<li> Add a few rows.</li>
+<li> Remove some.</li>
+</ol>
 <iframe src='mutation_observer_iframe.html'></iframe>
 <script>
   const iframe = document.querySelector('iframe');

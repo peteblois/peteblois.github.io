@@ -8,7 +8,6 @@
 <body>
   <button id='add'>Add row</button>
   <button id='remove'>Remove row</button>
-  <button id='inline'>Add inline content</button>
   <div id='content'></div>
 
 <script>
@@ -25,14 +24,6 @@ document.querySelector('#remove').addEventListener('click', () => {
     content.children[0].remove();
   }
 });
-
-document.querySelector('#inline').addEventListener('click', () => {
-  const div = document.createElement('div');
-  div.style.display = 'inline';
-  div.style.padding = '20px';
-  div.textContent = 'This is inlined content.';
-  content.appendChild(div);
-})
 
 const observer = new MutationObserver((entries) => {
   window.parent.postMessage({
