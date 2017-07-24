@@ -11,25 +11,27 @@
   <div id='content'></div>
 
 <script>
-const content = document.querySelector('#content');
+(function() {
+  const content = document.querySelector('#content');
 
-document.querySelector('#add').addEventListener('click', () => {
-  const div = document.createElement('div');
-  div.textContent = 'This is a row.';
-  content.appendChild(div);
-});
+  document.querySelector('#add').addEventListener('click', () => {
+    const div = document.createElement('div');
+    div.textContent = 'This is a row.';
+    content.appendChild(div);
+  });
 
-document.querySelector('#remove').addEventListener('click', () => {
-  if (content.children.length > 0) {
-    content.children[0].remove();
-  }
-});
+  document.querySelector('#remove').addEventListener('click', () => {
+    if (content.children.length > 0) {
+      content.children[0].remove();
+    }
+  });
 
-const observer = new MutationObserver((entries) => {
-  window.parent.postMessage({
-    height: document.body.scrollHeight,
-  }, '*');
-});
-observer.observe(document.body, {childList: true, subtree: true});
+  const observer = new MutationObserver((entries) => {
+    window.parent.postMessage({
+      height: document.body.scrollHeight,
+    }, '*');
+  });
+  observer.observe(document.body, {childList: true, subtree: true});
+})();
 </script>
 </body>
