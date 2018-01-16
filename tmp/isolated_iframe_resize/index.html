@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<h1>Isolated iframe resizing</h1>
+This test:
+<ol>
+  <li>Populates an iframe with some content.</li>
+  <li>Resizes the iframe to be much larger than needed size.</li>
+  <li>Waits a short bit.</li>
+  <li>Resizes the iframe to be larger than the content, but smaller than the previous size</li>
+</ol>
+
+Observed:
+<ol>
+  <li>On OSX, the final layout has unnecessary scrolling in the iframe.</li>
+  <li>The amount of scroll appears to be proportional to the amount the iframe shrunk via the last resize operation.</li>
+</ol>
+
+<i>The contents of this iframe should not scroll!</i>
+<script>
+  async function main() {
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://x-colab.googleusercontent.com/v2/usercontent/b645cdf6ae3e8b14/outputframe.html?vrz=1`;
+    // iframe.style.border = '0px';
+    iframe.style.display = 'block';
+    iframe.style.height = '0';
+
+
+    await new Promise((resolve, reject) => {
+      iframe.onload = resolve;
+      iframe.onerror = reject;
+      document.body.appendChild(iframe);
+    });
+
+    const iframeSource = new URL('iframe.js', window.location);
+
+    iframe.contentWindow.postMessage({
+      'sandboxed_iframe_evaluation': `
+        const script = document.createElement('script');
+        script.src = "${iframeSource}";
+        document.head.appendChild(script);
+      `,
+    }, '*');
+
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    iframe.style.height = '200px';
+
+    // iframe height should actually be 118px, so no scrolling should be observed.
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    iframe.style.height = '150px';
+  }
+
+  main();
+</script>
