@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <style>
 iframe {
-  margin-bottom: 1000px;
+  margin-bottom: 2000px;
 }
 </style>
 <h1>Isolated iframe scrolling page</h1>
 Repro steps:
 <ol>
-  <li>Load on OSX</li>
-  <li>Click inside the iframe to add some more items to the iframe</li>
+  <li>Load on OSX.</li>
+  <li>Scroll the iframe to the bottom of the contents (but keep the page near the top).</li>
+  <li>Click the 'Add more iframe content' button to add more items to the iframe.</li>
+  <li>Attempt to scroll the iframe down to view the added items.</li>
 </ol>
 
 Observed:
 <ul>
-  <li>Text is found, but is not scrolled into view.</li>
+  <li>Scrolling down immediately after adding content scrolls page instead of iframe.</li>
+  <li>Scrolling up just a bit will fix the vertical scroll of the iframe.</li>
 </ul>
 
 Expected:
 <ul>
-  <li>Selected text is scrolled into view.</li>
+  <li>After iframe content is added, iframe can be scrolled down.</li>
 </ul>
 
 <button>Add more iframe content</button>
@@ -51,11 +54,6 @@ Expected:
       iframe.onerror = reject;
       document.body.appendChild(iframe);
     });
-
-    // window.addEventListener('message', (e) => {
-    //   const data = e.data;
-    //   iframe.style.height = `${data.height}px`;
-    // });
 
     addContentToIframe();
   }
