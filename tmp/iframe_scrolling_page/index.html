@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<style>
+iframe {
+  margin-bottom: 1000px;
+}
+</style>
+<h1>Isolated iframe scrolling page</h1>
+This test:
+<ul>
+  <li>Invoke Chrome's 'find', search for 'sometexttofind'</li>
+</ul>
+
+Observed:
+<ul>
+  <li>Text is found, but is not scrolled into view.</li>
+</ul>
+
+Expected:
+<ul>
+  <li>Selected text is scrolled into view.</li>
+</ul>
+
+
+<script>
+  async function main() {
+
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://x-colab.googleusercontent.com/v2/usercontent/b645cdf6ae3e8b14/outputframe.html?vrz=1`;
+    iframe.style.display = 'block';
+
+
+    await new Promise((resolve, reject) => {
+      iframe.onload = resolve;
+      iframe.onerror = reject;
+      document.body.appendChild(iframe);
+    });
+
+    const iframeSource = new URL('iframe.js', window.location);
+
+    window.addEventListener('message', (e) => {
+      const data = e.data;
+      iframe.style.height = `${data.height}px`;
+    });
+
+    iframe.contentWindow.postMessage({
+      'sandboxed_iframe_evaluation': `
+        const script = document.createElement('script');
+        script.src = "${iframeSource}";
+        document.head.appendChild(script);
+      `,
+    }, '*');
+  }
+
+  main();
+</script>
