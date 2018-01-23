@@ -5,10 +5,11 @@ iframe {
 }
 </style>
 <h1>Isolated iframe scrolling page</h1>
-This test:
-<ul>
-  <li>Invoke Chrome's 'find', search for 'sometexttofind'</li>
-</ul>
+Repro steps:
+<ol>
+  <li>Load on OSX</li>
+  <li>Click inside the iframe to add some more items to the iframe</li>
+</ol>
 
 Observed:
 <ul>
@@ -20,6 +21,8 @@ Expected:
   <li>Selected text is scrolled into view.</li>
 </ul>
 
+<button>Add more iframe content</button>
+
 
 <script>
   async function main() {
@@ -28,6 +31,20 @@ Expected:
     iframe.src = `https://x-colab.googleusercontent.com/v2/usercontent/b645cdf6ae3e8b14/outputframe.html?vrz=1`;
     iframe.style.display = 'block';
 
+    function addContentToIframe() {
+      const iframeSource = new URL('iframe.js', window.location);
+
+      iframe.contentWindow.postMessage({
+        'sandboxed_iframe_evaluation': `
+          const script = document.createElement('script');
+          script.src = "${iframeSource}";
+          document.head.appendChild(script);
+        `,
+      }, '*');
+    };
+
+    document.querySelector('button').onclick = addContentToIframe;
+
 
     await new Promise((resolve, reject) => {
       iframe.onload = resolve;
@@ -35,20 +52,12 @@ Expected:
       document.body.appendChild(iframe);
     });
 
-    const iframeSource = new URL('iframe.js', window.location);
+    // window.addEventListener('message', (e) => {
+    //   const data = e.data;
+    //   iframe.style.height = `${data.height}px`;
+    // });
 
-    window.addEventListener('message', (e) => {
-      const data = e.data;
-      iframe.style.height = `${data.height}px`;
-    });
-
-    iframe.contentWindow.postMessage({
-      'sandboxed_iframe_evaluation': `
-        const script = document.createElement('script');
-        script.src = "${iframeSource}";
-        document.head.appendChild(script);
-      `,
-    }, '*');
+    addContentToIframe();
   }
 
   main();
