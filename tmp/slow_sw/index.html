@@ -1,0 +1,94 @@
+<!doctype html>
+<h1>random iframe origins</h1>
+<div class='counter'></div>
+<script>
+  let count = 0;
+  function getOrigin() {
+    const array = new Uint32Array(1);
+    window.crypto.getRandomValues(array);
+    const float = array[0] / (1 << 16) / (1 << 16);
+    return float.toString(36).substr(2);
+  }
+
+  async function createIframe() {
+    incrementCount();
+    // const origin = Math.floor(Date.now() / 10000); // 'x';//getOrigin();
+    const origin = getOrigin();
+
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://${origin}-colab.googleusercontent.com/v2/usercontent/8e59aaa8af92fda0/outputframe.html?vrz=1`;
+
+    await new Promise((resolve, reject) => {
+      iframe.onload = resolve;
+      iframe.onerror = reject;
+      document.body.appendChild(iframe);
+    });
+
+    const iframeSource = new URL('iframe_source.js', window.location);
+
+    const channel = new MessageChannel();
+
+    const loaded = new Promise((resolve) => {
+      channel.port1.onmessage = (msg) => {
+        if (msg.data.error) {
+          log(msg.data.error);
+        }
+        resolve();
+      }
+    });
+
+
+    iframe.contentWindow.postMessage({
+      'sandboxed_iframe_evaluation': `
+        window.config = window.currentMessage;
+        const script = document.createElement('script');
+        script.src = "${iframeSource}";
+        document.head.appendChild(script);
+      `,
+      port: channel.port2,
+    }, '*', [channel.port2]);
+
+    await loaded;
+
+    iframe.remove();
+  }
+
+  async function iframeLooper() {
+    while(true) {
+      const promise = createIframe();
+      let timer = 0;
+      const timeout = new Promise((resolve, reject) => {
+        timer = setTimeout(() => {
+          reject("iframe load timed out!");
+        }, 15000);
+      });
+      promise.then(() => {
+        clearTimeout(timer);
+      });
+      try {
+        await Promise.race([promise, timeout]);
+      } catch(e) {
+        log(`iframe error ${e}`);
+      }
+    }
+  }
+
+  async function main() {
+    for (let i = 0; i < 5; ++i) {
+      iframeLooper();
+    }
+  }
+
+  main();
+
+  function log(msg) {
+    const e = document.createElement('div');
+    e.textContent = msg;
+    document.body.appendChild(e);
+  }
+
+
+  function incrementCount() {
+    document.querySelector('.counter').textContent = `Loaded ${++count} frames`;
+  }
+</script>
