@@ -90,5 +90,9 @@
 
   function incrementCount() {
     document.querySelector('.counter').textContent = `Loaded ${++count} frames`;
+
+    if (count > 50) {
+      window.location.reload();
+    }
   }
 </script>
