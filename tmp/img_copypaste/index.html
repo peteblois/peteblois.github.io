@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<style>
+iframe {
+  margin-top: 1000px;
+  height: 800px;
+  width: 500px;
+}
+</style>
+
+<h1>Isolated iframe image copy/paste</h1>
+Repro steps:
+<ol>
+  <li>Scroll the page down some so the contents of the iframe are visible.</li>
+  <li>Right-click on one of the colored images and select 'Copy image'.</li>
+  <li>Paste into Google Docs.</li>
+</ol>
+
+Observed:
+<ol>
+  <li>Frequently the wrong image is copied or no image is copied.</li>
+</ol>
+
+Additional notes:
+<ul>
+  <li>What gets copied appears to be dependent on window scroll position. </li>
+  <li>If it doesn't repro at first then scroll the main frame some and try copying from a different location on the image.</li>
+  <li>Also try putting some text on the clipboard before copying an image, to easily see if the copy did nothing.</li>
+</ul>
+
+
+<!-- <iframe src='iframe.html'></iframe> -->
+
+<body>
+<script>
+  async function main() {
+
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://x-colab.googleusercontent.com/v2/usercontent/b645cdf6ae3e8b14/outputframe.html?vrz=1`;
+    iframe.style.display = 'block';
+
+
+    await new Promise((resolve, reject) => {
+      iframe.onload = resolve;
+      iframe.onerror = reject;
+      document.body.appendChild(iframe);
+    });
+
+    const iframeSource = new URL('iframe.js', window.location);
+
+    iframe.contentWindow.postMessage({
+      'sandboxed_iframe_evaluation': `
+        const script = document.createElement('script');
+        script.src = "${iframeSource}";
+        document.head.appendChild(script);
+      `,
+    }, '*');
+  }
+
+  main();
+</script>
+
+</body>
