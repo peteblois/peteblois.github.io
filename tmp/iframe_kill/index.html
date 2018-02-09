@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<h1>Isolated iframe process</h1>
+Repro steps:
+<ol>
+  <li>Load this page ✔.</li>
+  <li>Open Chrome's task manager, sort by CPU</li>
+  <li>Observe 'Subframe: https://googleusercontent.com/' at the top, get the process ID</li>
+  <li>Close the tab</li>
+  <li>Observe process disappears from taskmanager</li>
+  <li>Run 'top'- observe the process is still there, consuming 100% CPU</li>
+</ol>
+
+<script>
+  async function main() {
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://x-colab.googleusercontent.com/v2/usercontent/b645cdf6ae3e8b14/outputframe.html?vrz=1`;
+    // iframe.style.border = '0px';
+    iframe.style.display = 'block';
+    iframe.style.height = '0';
+
+
+    await new Promise((resolve, reject) => {
+      iframe.onload = resolve;
+      iframe.onerror = reject;
+      document.body.appendChild(iframe);
+    });
+
+    const iframeSource = new URL('iframe.js', window.location);
+
+    iframe.contentWindow.postMessage({
+      'sandboxed_iframe_evaluation': `
+        const script = document.createElement('script');
+        script.src = "${iframeSource}";
+        document.head.appendChild(script);
+      `,
+    }, '*');
+  }
+
+  main();
+</script>
