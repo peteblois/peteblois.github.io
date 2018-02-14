@@ -1,0 +1,33 @@
+<!doctype html>
+<meta charset="UTF-8">
+
+<h1>beforeunload & file download links</h1>
+
+Repro steps:
+<ol>
+  <li>Add an onbeforeunload handler to window that prompts before navigation.</li>
+  <li>User clicks a download link.</li>
+</ol>
+
+Expected:
+<ul>
+  <li>Download does not prompt about page navigation.</li>
+</ul>
+
+Observed:
+<ul>
+  <li>Download link prompts for page navigation.</li>
+</ul>
+
+
+
+<a id='download' download='foo.txt'>Click to initiate a file download.</a>
+
+<script>
+  window.onbeforeunload = (e) => {
+    e.returnValue = 'Unsaved changes'
+  }
+
+  const a = document.querySelector('#download');
+  a.href = URL.createObjectURL(new Blob([""]));
+</script>
