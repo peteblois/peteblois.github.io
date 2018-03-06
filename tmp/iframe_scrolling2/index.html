@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<style>
+body {
+  margin-top: 2000px;
+}
+iframe {
+  margin-bottom: 2000px;
+  height: 500px;
+}
+</style>
+<h1>Isolated iframe scrolling page</h1>
+Repro steps:
+<ol>
+  <li>Scroll the page so that the iframe is visible.</li>
+  <li>With a single mouse gesture, attempt to select the line which says 'Try to select this line'.</li>
+</ol>
+
+Observed:
+<ul>
+  <li>The page scroll position jumps when the selection gesture begins.</li>
+</ul>
+
+Expected:
+<ul>
+  <li>The page does not jump while selecting.</li>
+</ul>
+
+
+<script>
+  async function main() {
+
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://x-colab.googleusercontent.com/v2/usercontent/b645cdf6ae3e8b14/outputframe.html?vrz=1`;
+    iframe.style.display = 'block';
+
+    function addContentToIframe() {
+      const iframeSource = new URL('iframe.js', window.location);
+
+      iframe.contentWindow.postMessage({
+        'sandboxed_iframe_evaluation': `
+          const script = document.createElement('script');
+          script.src = "${iframeSource}";
+          document.head.appendChild(script);
+        `,
+      }, '*');
+    };
+
+
+    await new Promise((resolve, reject) => {
+      iframe.onload = resolve;
+      iframe.onerror = reject;
+      document.body.appendChild(iframe);
+    });
+
+    addContentToIframe();
+    document.scrollingElement.scrollTop = 20000;
+  }
+
+  main();
+</script>
