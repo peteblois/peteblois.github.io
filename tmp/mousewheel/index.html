@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<h1>Isolated iframe wheel events</h1>
+Repro steps:
+<ol>
+  <li>Mouse wheel over the second iframe.</li>
+</ol>
+
+Observed:
+<ul>
+  <li>Second iframe does not receive wheel events.</li>
+</ul>
+
+<body>
+<script>
+  async function main() {
+
+    async function createIframe() {
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://x-colab.googleusercontent.com/v2/usercontent/b645cdf6ae3e8b14/outputframe.html?vrz=1`;
+      iframe.style.display = 'block';
+
+
+      await new Promise((resolve, reject) => {
+        iframe.onload = resolve;
+        iframe.onerror = reject;
+        document.body.appendChild(iframe);
+      });
+
+      const iframeSource = new URL('iframe.js', window.location);
+
+      iframe.contentWindow.postMessage({
+        'sandboxed_iframe_evaluation': `
+          const script = document.createElement('script');
+          script.src = "${iframeSource}";
+          document.head.appendChild(script);
+        `,
+      }, '*');
+    }
+
+    await createIframe();
+    document.body.appendChild(document.createTextNode('The next iframe does not receive wheel events.'));
+    await createIframe();
+  }
+
+  main();
+</script>
+
+</body>
