@@ -34,27 +34,38 @@ body, html {
   cursor: pointer;
 }
 
+ol {
+  margin-top: 0;
+}
+
 </style>
 
 <div class='root'>
   <h1>Smooth scrolling containers</h1>
 
   Example of a table of contents navigation with a container using smooth-scrolling.
+  <br/>
+  <br/>
 
-  Setup:
+  <b>Setup:</b>
   <ol>
     <li>'scroll-behavior: smooth' is being used to smoothly scroll main contents.</li>
     <li>element.scrollIntoView() is being used to make main content visible.</li>
     <li>element.scrollIntoView() is being used make table of contents item visible.</li>
   </ol>
 
-  Issue:
-  <br/>
+  <b>Issue:</b>
   When element.scrollIntoView is called from within two different scrolling
   containers then the second scrollIntoView call will interrupt the first, if
   the first is using smooth-scrolling.
-
-  <p/>
+  <br/>
+  <br/>
+  <b>Repro:</b>
+  <ol>
+    <li>Click the 'smooth' links below to smoothly scroll the main content into view.</li>
+    <li>Observe that it does not scroll.</li>
+    <li>Observe that 'instant' scrolling does work.</li>
+  </ol>
 
   <div class='horizontal'>
     <div class='sidebar'>
