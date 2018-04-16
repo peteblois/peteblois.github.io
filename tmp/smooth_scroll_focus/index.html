@@ -1,0 +1,94 @@
+<!doctype html>
+
+<style>
+body, html {
+  margin: 0;
+  height: 100%;
+}
+.root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.horizontal {
+  display: flex;
+
+}
+
+.sidebar {
+  width: 200px;
+  overflow: auto;
+}
+
+.container {
+  overflow: auto;
+  flex-grow: 1;
+}
+
+.container > pre {
+  height: 100px;
+  border: 1px solid black;
+}
+
+.sidebar > div {
+  cursor: pointer;
+}
+
+</style>
+
+<div class='root'>
+  <h1>Smooth scrolling containers</h1>
+
+  Example of a table of contents navigation with a container using smooth-scrolling.
+
+  Setup:
+  <ol>
+    <li>'scroll-behavior: smooth' is being used to smoothly scroll main contents.</li>
+    <li>element.scrollIntoView() is being used to make main content visible.</li>
+    <li>element.scrollIntoView() is being used make table of contents item visible.</li>
+  </ol>
+
+  Issue:
+  <br/>
+  When element.scrollIntoView is called from within two different scrolling
+  containers then the second scrollIntoView call will interrupt the first, if
+  the first is using smooth-scrolling.
+
+  <p/>
+
+  <div class='horizontal'>
+    <div class='sidebar'>
+      <h3>Table of Contents</h3>
+      <ol class='toc'>
+      </ol>
+    </div>
+    <div class='container'>
+    </div>
+  </div>
+</div>
+
+<script>
+const container = document.querySelector('.container');
+const sidebar = document.querySelector('.toc');
+
+for (let i = 0; i < 30; ++i) {
+  const e = document.createElement('pre');
+  e.textContent = i;
+  container.appendChild(e);
+
+  const e2 = document.createElement('li');
+  const anchor = document.createElement('a');
+  anchor.textContent = `Item #${i}`;
+  anchor.href = `#${i}`;
+  e2.appendChild(anchor);
+  sidebar.appendChild(e2);
+  anchor.onclick = (event) => {
+    e.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    });
+    e2.scrollIntoView();
+    event.preventDefault();
+  };
+}
+</script>
