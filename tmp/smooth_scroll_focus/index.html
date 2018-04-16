@@ -16,7 +16,7 @@ body, html {
 }
 
 .sidebar {
-  width: 200px;
+  width: 300px;
   overflow: auto;
 }
 
@@ -77,14 +77,30 @@ for (let i = 0; i < 30; ++i) {
   container.appendChild(e);
 
   const e2 = document.createElement('li');
-  const anchor = document.createElement('a');
-  anchor.textContent = `Item #${i}`;
-  anchor.href = `#${i}`;
-  e2.appendChild(anchor);
+  e2.textContent = `Scroll to ${i} `;
+  const smooth = document.createElement('a');
+  smooth.textContent = `smooth`;
+  smooth.href = `#${i}`;
+  e2.appendChild(smooth);
   sidebar.appendChild(e2);
-  anchor.onclick = (event) => {
+  smooth.onclick = (event) => {
     e.scrollIntoView({
       behavior: 'smooth',
+      block: 'center',
+    });
+    e2.scrollIntoView();
+    event.preventDefault();
+  };
+
+  const instant = document.createElement('a');
+  e2.appendChild(document.createTextNode(' '));
+  instant.textContent = `instant`;
+  instant.href = `#${i}`;
+  e2.appendChild(instant);
+  sidebar.appendChild(e2);
+  instant.onclick = (event) => {
+    e.scrollIntoView({
+      behavior: 'instant',
       block: 'center',
     });
     e2.scrollIntoView();
