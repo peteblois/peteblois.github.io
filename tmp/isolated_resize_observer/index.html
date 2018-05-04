@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<style>
+  iframe {
+    width: 100%;
+    height: 0px;
+  }
+</style>
+<h1>Isolated iframe ResizeObserver</h1>
+This test:
+<ol>
+  <li>Adds an isolated iframe with 0px height to the document.</li>
+  <li>Creates a ResizeObserver on document.body to be notified when the iframe contents are resized.</li>
+  <li>Adds elements to the body every 1 second.</li>
+</ol>
+
+Observed:
+<ol>
+  <li>While the iframe height is 0px, the ResizeObserver never fires.</li>
+  <li>If the iframe is increased to 1px, then the ResizeObserver starts firing.</li>
+</ol>
+
+<button>Set iframe height to 1px</button>
+
+<script>
+  (async () => {
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://x-colab.googleusercontent.com/v2/usercontent/b645cdf6ae3e8b14/outputframe.html?vrz=1`;
+    // iframe.style.border = '0px';
+    iframe.style.display = 'block';
+    iframe.style.height = '0';
+
+    window.addEventListener('message', (e) => {
+      const data = e.data;
+      iframe.style.height = `${data.height}px`;
+    })
+
+    await new Promise((resolve, reject) => {
+      iframe.onload = resolve;
+      iframe.onerror = reject;
+      document.body.appendChild(iframe);
+    });
+
+    const iframeSource = new URL('iframe.js', window.location);
+
+    iframe.contentWindow.postMessage({
+      'sandboxed_iframe_evaluation': `
+        const script = document.createElement('script');
+        script.src = "${iframeSource}";
+        document.head.appendChild(script);
+      `,
+    }, '*');
+
+    document.querySelector('button').addEventListener('click', () => {
+      iframe.style.height = '1px';
+    });
+  })();
+</script>
