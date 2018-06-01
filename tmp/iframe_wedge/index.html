@@ -5,11 +5,10 @@
 Repro steps:
 <ol>
   <li>Load this page ✔.</li>
-  <li>Open Chrome's task manager, sort by CPU</li>
-  <li>Observe 'Subframe: https://googleusercontent.com/' at the top, get the process ID</li>
-  <li>Close the tab</li>
-  <li>Observe process disappears from taskmanager</li>
-  <li>Run 'top'- observe the process is still there, consuming 100% CPU</li>
+  <li>Observe the 'Created iframe!' message.</li>
+  <li>Load this page in a new tab.</li>
+  <li>Observe the page does not complete loading.</li>
+  <li>Close this page, wait for new page to complete loading.</li>
 </ol>
 
 <script>
