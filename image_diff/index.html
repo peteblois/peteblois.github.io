@@ -1,0 +1,156 @@
+<!doctype html>
+
+<style>
+  #displayA, #displayB, #displayDiff {
+    border: 2px solid black;
+    display: inline-block;
+  }
+  #diffDetails {
+    font-family: monospace;
+  }
+</style>
+
+<input type='file' id='a'>
+<input type='file' id='b'>
+
+<p/>
+
+<div id='displayA'></div>
+<div id='displayB'></div>
+<div id='diffDetails'></div>
+<div id='displayDiff'></div>
+
+
+<script>
+  const inputA = document.querySelector('#a');
+  const inputB = document.querySelector('#b');
+
+  const files = [
+    undefined,
+    undefined,
+  ];
+
+  inputA.addEventListener('change', (e) => {
+    const file = inputA.files[0];
+    files[0] = URL.createObjectURL(file);
+
+    updateDiffs();
+  });
+
+  inputB.addEventListener('change', (e) => {
+    const file = inputB.files[0];
+    files[1] = URL.createObjectURL(file);
+
+    updateDiffs();
+  });
+
+  function hex(v) {
+    let str = Number(v).toString(16);
+    while (str.length < 2) {
+      str = '0' + str;
+    }
+    return str.toUpperCase();
+  }
+
+  function hexColor(r, g, b, a) {
+    return `#${hex(r)}${hex(g)}${hex(b)}`;
+  }
+
+  const diffDetails = document.querySelector('#diffDetails');
+
+  function reportDifference(line) {
+    const div = document.createElement('div');
+    div.appendChild(document.createTextNode(line));
+    diffDetails.appendChild(div);
+  }
+
+  async function updateDiffs() {
+    if (!files[0] || !files[1]) {
+      return;
+    }
+
+    const displayA = document.querySelector('#displayA');
+    const displayB = document.querySelector('#displayB');
+    const displayDiff = document.querySelector('#displayDiff');
+
+    displayA.textContent = '';
+    displayB.textContent = '';
+    displayDiff.textContent = '';
+    diffDetails.textContent = '';
+
+    const imgA = document.createElement('img');
+    imgA.src = files[0];
+    await new Promise((resolve, reject) => {
+      imgA.onload = resolve;
+      imgA.onerror = reject;
+      displayA.appendChild(imgA);
+    });
+
+
+    const imgB = document.createElement('img');
+    imgB.src = files[1];
+    await new Promise((resolve, reject) => {
+      imgB.onload = resolve;
+      imgB.onerror = reject;
+      displayB.appendChild(imgB);
+    });
+
+    const canvasA = document.createElement('canvas');
+    canvasA.width = imgA.naturalWidth;
+    canvasA.height = imgA.naturalHeight;
+    const ctxA = canvasA.getContext('2d');
+    ctxA.drawImage(imgA, 0, 0);
+
+    const canvasB = document.createElement('canvas');
+    canvasB.width = imgB.naturalWidth;
+    canvasB.height = imgB.naturalHeight;
+    const ctxB = canvasB.getContext('2d');
+    ctxB.drawImage(imgB, 0, 0);
+
+    const diff = document.createElement('canvas');
+    displayDiff.appendChild(diff);
+    diff.width = Math.max(canvasA.width, canvasB.width);
+    diff.height = Math.max(canvasA.height, canvasB.height);
+    const ctxC = diff.getContext('2d');
+
+    const dataA = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
+    const dataB = ctxB.getImageData(0, 0, canvasB.width, canvasB.height);
+    const dataC = ctxC.getImageData(0, 0, diff.width, diff.height);
+
+    for (let y = 0; y < diff.height; ++y) {
+      let posA = dataA.width * y * 4;
+      let posB = dataB.width * y * 4;
+      let posC = dataC.width * y * 4;
+
+      for (let x = 0; x < diff.width; ++x) {
+        dataC.data[posC++] = 0;
+        dataC.data[posC++] = 0;
+        dataC.data[posC++] = 0;
+        dataC.data[posC++] = 255;
+
+        const rA = dataA.data[posA++];
+        const gA = dataA.data[posA++];
+        const bA = dataA.data[posA++];
+        const aA = dataA.data[posA++];
+
+        const rB = dataB.data[posB++];
+        const gB = dataB.data[posB++];
+        const bB = dataB.data[posB++];
+        const aB = dataB.data[posB++];
+
+        if (rA != rB || gA != gB || bA != bB || aA != aB) {
+          reportDifference(`pixel at ${x}x${y} ${hexColor(rA, gA, bA, aA)} vs ${hexColor(rB, gB, bB, aA)}`);
+
+          let posC = (dataC.width * y + x) * 4;
+          dataC.data[posC++] = 255;
+          dataC.data[posC++] = 255;
+          dataC.data[posC++] = 255;
+          dataC.data[posC++] = 255;
+        }
+      }
+    }
+    ctxC.putImageData(dataC, 0, 0);
+  }
+
+  updateDiffs();
+</script>
