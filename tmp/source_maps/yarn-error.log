@@ -1,0 +1,43 @@
+Arguments: 
+  /usr/local/google/home/blois/.nvm/versions/node/v8.12.0/bin/node /usr/local/google/home/blois/.yarn/bin/yarn.js install
+
+PATH: 
+  /usr/local/google/home/blois/.nvm/versions/node/v8.12.0/bin:/usr/local/google/home/blois/.yarn/bin:/usr/local/google/home/blois/.config/yarn/global/node_modules/.bin:/usr/lib/google-golang/bin:/usr/local/buildtools/java/jdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/google/home/blois/bin
+
+Yarn version: 
+  1.5.1
+
+Node version: 
+  8.12.0
+
+Platform: 
+  linux x64
+
+npm manifest: 
+  {
+    "version": "0.0.1",
+    "name": "source_maps",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/peteblois/source_maps"
+    },
+  
+    "dependencies": {
+      "source-map": "~0.7.3"
+    },
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
+
+Trace: 
+  SyntaxError: /usr/local/google/home/blois/src/github/peteblois/peteblois.github.io/tmp/source_maps/package.json: Unexpected token } in JSON at position 198
+      at JSON.parse (<anonymous>)
+      at /usr/local/google/home/blois/.yarn/lib/cli.js:1036:59
+      at Generator.next (<anonymous>)
+      at step (/usr/local/google/home/blois/.yarn/lib/cli.js:98:30)
+      at /usr/local/google/home/blois/.yarn/lib/cli.js:109:13
+      at <anonymous>

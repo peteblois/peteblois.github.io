@@ -1,0 +1,112 @@
+<html>
+
+<script src="https://unpkg.com/source-map@0.7.3/dist/source-map.js"></script>
+<style>
+  .error {
+    color: red;
+  }
+</style>
+<body>
+Stack trace:
+<div>
+  <textarea class='stack' rows="15" cols="150">
+  </textarea>
+</div>
+Sourcemap:
+<div>
+  <input type="file" class="sourcemap">
+</div>
+
+<div class='error'></div>
+<div class='result'></div>
+<script>
+   sourceMap.SourceMapConsumer.initialize({
+        "lib/mappings.wasm": "https://unpkg.com/source-map@0.7.3/lib/mappings.wasm"
+    });
+  (async () => {
+    const srcmapPicker = document.querySelector('.sourcemap');
+    srcmapPicker.addEventListener('change', (e) => {
+      const file = srcmapPicker.files[0];
+      const stack = document.querySelector('.stack').value;
+
+      updateTraceback(file, stack);
+    });
+
+    async function updateTraceback(file, stackTrace) {
+      error('');
+      displayResult('');
+
+      let name = file.name;
+      if (!name.endsWith('.sourcemap')) {
+        error(`${file.name} does not have a .sourcemap extension`);
+      }
+      const moduleName = name.substring(0, name.length - '.sourcemap'.length);
+      const regexp = new RegExp('(.*' + moduleName + '.js.*:([\\d]+):(\\d+)\)', 'g');
+      const lineColumnPairs = [];
+      let matches;
+      while (matches = regexp.exec(stackTrace)) {
+        lineColumnPairs.push({line: Number(matches[2]) , column: Number(matches[3])});
+      }
+      const response = await fetch(URL.createObjectURL(file));
+      const jsonObj = await response.json();
+      const smc = await window.sourceMap.SourceMapConsumer.with(jsonObj, null, (consumer) => {
+        let result = '';
+        for (const pair of lineColumnPairs) {
+          const output = consumer.originalPositionFor(pair);
+          const line = `${output.source},` +
+                    `line: ${output.line}, ` +
+                    `column: ${output.column},  ` +
+                    `name: ${output.name}`;
+          const pre = document.createElement('pre');
+          pre.textContent = line;
+          document.querySelector('.result').appendChild(pre);
+        }
+      });
+
+    }
+
+    function error(msg) {
+      document.querySelector('.error').textContent = msg;
+    }
+    function displayResult(msg) {
+      document.querySelector('.result').textContent = msg;
+    }
+  })();
+
+// This file makes use of Mozilla's source map library. https://github.com/mozilla/source-map.
+function main() {
+  const lineColumnPairs = [];
+  let matches;
+  while (matches = REGEXP.exec(STACK_TRACE)) {
+    lineColumnPairs.push({line: Number(matches[1]) , column: Number(matches[2])});
+  }
+  fetch('listen.sourcemap')
+  .then(result => result.json())
+  .then(jsonObj => {
+    const smc = new window.sourceMap.SourceMapConsumer(jsonObj);
+    lineColumnPairs.forEach(pair => {
+      const output = smc.originalPositionFor(pair);
+      console.log(`${output.source},` +
+                  `line: ${output.line}, ` +
+                  `column: ${output.column},  ` +
+                  `name: ${output.name}`);
+      });
+  });
+}
+
+const REGEXP = /\(.*listen.js:(.*):(.*)\)/g;
+
+const STACK_TRACE = `Uncaught Wwcause: TypeError: Cannot read property 'wa' of null
+    at TZ.d.ST (https://play-music.gstatic.com/fe/0cbd136eacc0642f5fd417fa5438a882/listen.js:2070:122)
+    at TZ.d.yfb (https://play-music.gstatic.com/fe/0cbd136eacc0642f5fd417fa5438a882/listen.js:2069:86)
+    at Rw.y (https://play-music.gstatic.com/fe/0cbd136eacc0642f5fd417fa5438a882/listen.js:2063:153)
+    at Rw.d.gJ (https://play-music.gstatic.com/fe/0cbd136eacc0642f5fd417fa5438a882/listen.js:349:208)
+    at Rw.d.dispatchEvent (https://play-music.gstatic.com/fe/0cbd136eacc0642f5fd417fa5438a882/listen.js:347:362)
+    at Rw.d.Pna (https://play-music.gstatic.com/fe/0cbd136eacc0642f5fd417fa5438a882/listen.js:621:321)
+    at Rw.d.pEa (https://play-music.gstatic.com/fe/0cbd136eacc0642f5fd417fa5438a882/listen.js:623:355)
+    at Rw.d.taa (https://play-music.gstatic.com/fe/0cbd136eacc0642f5fd417fa5438a882/listen.js:622:402)
+    at Rw.c [as taa] (https://play-music.gstatic.com/fe/0cbd136eacc0642f5fd417fa5438a882/listen.js:628:126)
+    at Rw.d.qEa`;
+</script>
+</body>
+</html>
