@@ -72,41 +72,6 @@ Sourcemap:
       document.querySelector('.result').textContent = msg;
     }
   })();
-
-// This file makes use of Mozilla's source map library. https://github.com/mozilla/source-map.
-function main() {
-  const lineColumnPairs = [];
-  let matches;
-  while (matches = REGEXP.exec(STACK_TRACE)) {
-    lineColumnPairs.push({line: Number(matches[1]) , column: Number(matches[2])});
-  }
-  fetch('listen.sourcemap')
-  .then(result => result.json())
-  .then(jsonObj => {
-    const smc = new window.sourceMap.SourceMapConsumer(jsonObj);
-    lineColumnPairs.forEach(pair => {
-      const output = smc.originalPositionFor(pair);
-      console.log(`${output.source},` +
-                  `line: ${output.line}, ` +
-                  `column: ${output.column},  ` +
-                  `name: ${output.name}`);
-      });
-  });
-}
-
-const REGEXP = /\(.*listen.js:(.*):(.*)\)/g;
-
-const STACK_TRACE = `Uncaught Wwcause: TypeError: Cannot read property 'wa' of null
-    at TZ.d.ST (https://play-music.gstatic.com/fe/0cbd136eacc0642f5fd417fa5438a882/listen.js:2070:122)
-    at TZ.d.yfb (https://play-music.gstatic.com/fe/0cbd136eacc0642f5fd417fa5438a882/listen.js:2069:86)
-    at Rw.y (https://play-music.gstatic.com/fe/0cbd136eacc0642f5fd417fa5438a882/listen.js:2063:153)
-    at Rw.d.gJ (https://play-music.gstatic.com/fe/0cbd136eacc0642f5fd417fa5438a882/listen.js:349:208)
-    at Rw.d.dispatchEvent (https://play-music.gstatic.com/fe/0cbd136eacc0642f5fd417fa5438a882/listen.js:347:362)
-    at Rw.d.Pna (https://play-music.gstatic.com/fe/0cbd136eacc0642f5fd417fa5438a882/listen.js:621:321)
-    at Rw.d.pEa (https://play-music.gstatic.com/fe/0cbd136eacc0642f5fd417fa5438a882/listen.js:623:355)
-    at Rw.d.taa (https://play-music.gstatic.com/fe/0cbd136eacc0642f5fd417fa5438a882/listen.js:622:402)
-    at Rw.c [as taa] (https://play-music.gstatic.com/fe/0cbd136eacc0642f5fd417fa5438a882/listen.js:628:126)
-    at Rw.d.qEa`;
 </script>
 </body>
 </html>
