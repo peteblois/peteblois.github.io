@@ -1,0 +1,23 @@
+<head>
+  <base href="https://cdn.rawgit.com/download/polymer-cdn/2.6.0.2/lib/">
+  <script src="webcomponentsjs/webcomponents-loader.js"></script>
+  <link rel="import" href="polymer/polymer.html">
+  <link rel="import" href="paper-input/paper-input.html">
+  <link rel="import" href="paper-slider/paper-slider.html">
+</head>
+
+<body>
+  <script>
+    const container = document.createElement('div');
+
+    for (let i = 0; i < 1000; ++i) {
+      container.appendChild(document.createElement('paper-input'));
+      const slider = document.createElement('paper-slider');
+      slider.value = 50;
+      slider.min = 0;
+      slider.max = 100;
+      container.appendChild(slider);
+    }
+    document.body.appendChild(container);
+  </script>
+</body>

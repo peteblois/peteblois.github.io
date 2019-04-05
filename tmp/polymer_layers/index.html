@@ -1,0 +1,56 @@
+<head>
+  <base href="https://cdn.rawgit.com/download/polymer-cdn/2.6.0.2/lib/">
+  <script src="webcomponentsjs/webcomponents-loader.js"></script>
+  <link rel="import" href="polymer/polymer.html">
+  <link rel="import" href="paper-input/paper-input.html">
+  <link rel="import" href="paper-slider/paper-slider.html">
+
+  <!-- <style>
+    paper-slider {
+      height: 32px;
+      contain: strict;
+    }
+
+    paper-input {
+      contain: strict;
+      height: 62px;
+    }
+  </style> -->
+</head>
+
+<body>
+  <script>
+    const container = document.createElement('div');
+
+    const optimize = document.createElement('button');
+    optimize.textContent = 'optimize';
+    container.appendChild(optimize);
+
+    for (let i = 0; i < 1000; ++i) {
+      container.appendChild(document.createElement('paper-input'));
+      const slider = document.createElement('paper-slider');
+      slider.value = 50;
+      slider.min = 0;
+      slider.max = 100;
+      container.appendChild(slider);
+    }
+    document.body.appendChild(container);
+
+    optimize.onclick = () => {
+      [...document.querySelectorAll('paper-slider')].forEach(e => {
+        e.$.sliderBar.$.secondaryProgress.style.transform = 'unset';
+        e.$.sliderBar.$.primaryProgress.style.transform = 'unset';
+        e.$.sliderBar.$.primaryProgress.style.willChange = 'unset';
+        e.$.sliderBar.$.primaryProgress.style.width = '50%';
+        e.style.contain = 'strict';
+        e.style.height = '32px';
+      });
+      [...document.querySelectorAll('paper-input')].forEach(e => {
+        e.$.container.shadowRoot.querySelector('.focused-line').style.transform = 'unset';
+        e.$.container.shadowRoot.querySelector('.focused-line').style.width = '0';
+        e.style.contain = 'strict';
+        e.style.height = '62px';
+      });
+    };
+  </script>
+</body>
