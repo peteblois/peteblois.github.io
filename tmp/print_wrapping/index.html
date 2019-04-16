@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<h1>Printing</h1>
+<h3>Issue:</h3>
+Absolutely positioned items incorrectly page-wrap when printed to PDF.
+
+<h3>Repro steps</h3>
+<ol>
+  <li>Preview the print result in Chrome</li>
+  <li>Observe items at the line breaks.</li>
+</ol>
+
+<script>
+  const container = document.createElement('div');
+  document.body.appendChild(container);
+  container.style.position = 'relative';
+  container.style.fontFamily = `"Droid Sans Mono", monospace, monospace, "Droid Sans Fallback"`;
+  container.style.fontSize = '14px';
+  container.style.lineHeight = '19px';
+
+  for (let i = 0; i < 200; ++i) {
+    const line = document.createElement('span');
+    line.style.height = '19px';
+    line.style.top = `${i * 19}px`;
+    line.style.position = 'absolute';
+    line.textContent = new Array(10).fill(' ').join(`${i}`);
+    container.appendChild(line);
+  }
+
+</script>
