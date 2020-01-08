@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+
+<style>
+div.stream, div.output_text, div.output_text pre {
+  display: inline;
+}
+</style>
+
+<body>
+  <script>
+    for (let i = 0; i < 1000; ++i) {
+      const line = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n';
+      const text = new Array(30).fill(line);
+      const pre = document.createElement('pre');
+      pre.textContent = text.join('');
+
+
+      const outputText = document.createElement('div');
+      outputText.classList.add('output_text');
+      outputText.appendChild(pre);
+
+      const stream = document.createElement('div');
+      stream.classList.add('stream');
+      stream.appendChild(outputText);
+
+      document.body.appendChild(stream);
+    }
+  </script>
+</body>
