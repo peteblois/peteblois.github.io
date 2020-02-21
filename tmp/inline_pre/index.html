@@ -15,15 +15,19 @@ div.stream, div.output_text, div.output_text pre {
       pre.textContent = text.join('');
 
 
-      const outputText = document.createElement('div');
-      outputText.classList.add('output_text');
-      outputText.appendChild(pre);
+      // const outputText = document.createElement('div');
+      // outputText.classList.add('output_text');
+      // outputText.appendChild(pre);
 
       const stream = document.createElement('div');
       stream.classList.add('stream');
-      stream.appendChild(outputText);
+      stream.appendChild(pre);
 
       document.body.appendChild(stream);
+
+      requestAnimationFrame(() => {
+        document.body.style.background = 'green';
+      });
     }
   </script>
 </body>
