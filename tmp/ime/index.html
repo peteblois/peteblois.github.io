@@ -3,6 +3,7 @@
 <style>
   .composing {
     border: 8px solid green;
+    background: red;
   }
 </style>
 
@@ -14,10 +15,12 @@
   const textarea = document.querySelector('textarea');
   textarea.addEventListener('compositionstart', () => {
     textarea.classList.add('composing');
+    document.body.classList.add('composing');
   });
 
   textarea.addEventListener('compositionend', () => {
     textarea.classList.remove('composing');
+    document.body.classList.remove('composing');
   });
   let count = 0;
   textarea.addEventListener('keydown', (e) => {
