@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<!-- DO NOT SUBMIT: Fix Page Title. Missing tags? http://go/optional-html -->
+<title>Page Title</title>
+<!DOCTYPE html>
+<head>
+  <meta charset="UTF-8">
+</head>
+<h1>Isolated iframe process</h1>
+Repro steps:
+<ol>
+  <li>Load this page ✔.</li>
+  <li class='loaded'>Observe that the iframe has loaded </li>
+  <li>Open Chrome's task manager, sort by CPU.</li>
+  <li>Observe 'Subframe: https://googleusercontent.com/' at the top.</li>
+  <li><a href='#' class='reload'>Reload</a> this page.</li>
+  <li>Observe process disappears from Chrome's taskmanager.</li>
+  <li>Run 'top'- observe the process is still there, consuming 100% CPU.</li>
+  <li>Observe that the iframe never loads the second time and never goes unresponsive.</li>
+</ol>
+
+<script>
+  async function main() {
+    document.querySelector('.reload').addEventListener('click', (e) => {
+      e.preventDefault();
+      window.location.reload();
+    });
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://x123-colab.googleusercontent.com/v2/usercontent/b645cdf6ae3e8b14/outputframe.html?vrz=1`;
+    iframe.style.display = 'block';
+    iframe.style.height = '100';
+
+
+    await new Promise((resolve, reject) => {
+      iframe.onload = resolve;
+      iframe.onerror = reject;
+      document.body.appendChild(iframe);
+    });
+    document.querySelector('.loaded').textContent += '✔.';
+
+    const iframeSource = new URL('iframe.js', window.location);
+
+    iframe.contentWindow.postMessage({
+      'sandboxed_iframe_evaluation': `
+        const script = document.createElement('script');
+        script.src = "${iframeSource}";
+        document.head.appendChild(script);
+      `,
+    }, '*');
+  }
+
+  main();
+</script>
