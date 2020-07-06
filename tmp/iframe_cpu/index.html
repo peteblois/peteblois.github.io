@@ -14,9 +14,9 @@ Repro steps:
   <li>Open Chrome's task manager, sort by CPU.</li>
   <li>Observe 'Subframe: https://googleusercontent.com/' at the top.</li>
   <li><a href='#' class='reload'>Reload</a> this page.</li>
-  <li>Observe process disappears from Chrome's taskmanager.</li>
-  <li>Run 'top'- observe the process is still there, consuming 100% CPU.</li>
   <li>Observe that the iframe never loads the second time.</li>
+  <li>Run 'top'- observe the process is still there, consuming 100% CPU.</li>
+  <li>(Does not reliably repro for everyone): Observe process disappears from Chrome's taskmanager.</li>
   <li>Observe that Chrome's 'unresponsive page' dialog is never displayed.</li>
 </ol>
 
