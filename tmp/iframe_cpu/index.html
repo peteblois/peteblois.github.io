@@ -5,6 +5,12 @@
 <!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
+  <style>
+    iframe {
+      width: 100%;
+      height: 30px;
+    }
+  </style>
 </head>
 <h1>Isolated iframe process</h1>
 Repro steps:
@@ -13,19 +19,13 @@ Repro steps:
   <li class='loaded'>Observe that the iframe has loaded </li>
   <li>Open Chrome's task manager, sort by CPU.</li>
   <li>Observe 'Subframe: https://googleusercontent.com/' at the top.</li>
-  <li><a href='#' class='reload'>Reload</a> this page.</li>
-  <li>Observe that the iframe never loads the second time.</li>
-  <li>Run 'top'- observe the process is still there, consuming 100% CPU.</li>
-  <li>(Does not reliably repro for everyone): Observe process disappears from Chrome's taskmanager.</li>
-  <li>Observe that Chrome's 'unresponsive page' dialog is never displayed.</li>
+  <li>Observe that the second iframe never loads.</li>
+  <li>Observe that Chrome's 'unresponsive page' dialog is not displayed after 30+ seconds.</li>
 </ol>
 
 <script>
-  async function main() {
-    document.querySelector('.reload').addEventListener('click', (e) => {
-      e.preventDefault();
-      window.location.reload();
-    });
+
+  async function loadIframe(source) {
     const iframe = document.createElement('iframe');
     iframe.src = `https://x123-colab.googleusercontent.com/v2/usercontent/b645cdf6ae3e8b14/outputframe.html?vrz=1`;
     iframe.style.display = 'block';
@@ -37,9 +37,8 @@ Repro steps:
       iframe.onerror = reject;
       document.body.appendChild(iframe);
     });
-    document.querySelector('.loaded').textContent += '✔.';
 
-    const iframeSource = new URL('iframe.js', window.location);
+    const iframeSource = new URL(source, window.location);
 
     iframe.contentWindow.postMessage({
       'sandboxed_iframe_evaluation': `
@@ -48,6 +47,43 @@ Repro steps:
         document.head.appendChild(script);
       `,
     }, '*');
+  }
+  async function main() {
+    await loadIframe('busy.js');
+    document.querySelector('.loaded').textContent += '✔.';
+
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    let div = document.createElement('div');
+    div.textContent = 'Creating new iframe with the same origin.'
+    document.body.appendChild(div);
+
+    const promise = loadIframe('simple.js');
+
+    div = document.createElement('div');
+    div.textContent = 'Waiting for second iframe to load: 0s'
+    document.body.appendChild(div);
+
+    let loaded = false;
+
+    const start = Date.now();
+    const timer = setInterval(() => {
+      if (loaded) {
+        return;
+      }
+      const elapsedSecs = Math.round((Date.now() - start) / 1000);
+      if (elapsedSecs > 35) {
+        div.textContent = `Waited ${elapsedSecs}s. Have you seen an unresponsive page prompt yet?`;
+      } else {
+        div.textContent = `Waiting for second iframe to load: ${elapsedSecs}s`;
+      }
+    }, 500);
+
+    promise.then(() => {
+      clearInterval(timer);
+      loaded = true;
+      div.textContent = 'Second iframe loaded!';
+    });
   }
 
   main();
